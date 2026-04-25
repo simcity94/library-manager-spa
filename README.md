@@ -61,4 +61,5 @@ This project demonstrates a clean SPA structure with client-side routing and reu
 ## 👨‍💻 Author
 
 Simeon Ivanov
+
 Aspiring JavaScript Developer 🚀
