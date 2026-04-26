@@ -4,6 +4,7 @@ import {layout} from './src/views/layout.js';
 import {homeView} from './src/views/home.js';
 import {usersView} from './src/views/users.js';
 import {booksView} from './src/views/books.js';
+import {bookDetailsView} from './src/views/bookDetails.js';
 import {activitiesView} from './src/views/activities.js';
 import {registerView} from './src/views/register.js';
 import {loginView} from './src/views/login.js';
@@ -35,16 +36,20 @@ page('/', () => {
   setActiveLink('/');
 });
 page('/index.html', () => page.redirect('/'));
-page('/users', () => {
-  renderPage(usersView());
+page('/users', async () => {
+  renderPage(await usersView());
   setActiveLink('/users');
 });
-page('/books', () => {
-  renderPage(booksView());
+page('/books', async () => {
+  renderPage(await booksView());
   setActiveLink('/books');
 });
-page('/activities', () => {
-  renderPage(activitiesView());
+page('/books/:id', async (ctx) => {
+  renderPage(await bookDetailsView(ctx));
+  setActiveLink('/books');
+});
+page('/activities', async () => {
+  renderPage(await activitiesView());
   setActiveLink('/activities');
 });
 page('/register', () => {
