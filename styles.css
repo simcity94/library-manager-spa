@@ -254,3 +254,57 @@ footer {
 .button.secondary:hover {
   background: #475569;
 }
+
+.activities-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.activity-form {
+  display: grid;
+  gap: 1rem;
+  max-width: 520px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-row.inline {
+  flex-direction: row;
+  align-items: center;
+}
+
+.form-row input[type="text"],
+.form-row input[type="datetime-local"] {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  font: inherit;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.button.danger {
+  background: #dc2626;
+}
+
+.button.danger:hover {
+  background: #b91c1c;
+}

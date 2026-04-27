@@ -2,7 +2,7 @@ import { html } from 'https://unpkg.com/lit-html?module';
 import { layout } from './layout.js';
 import { bookService } from '../services/bookService.js';
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 8;
 
 function getCurrentPage() {
   const params = new URLSearchParams(window.location.search);

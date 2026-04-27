@@ -6,6 +6,8 @@ import {usersView} from './src/views/users.js';
 import {booksView} from './src/views/books.js';
 import {bookDetailsView} from './src/views/bookDetails.js';
 import {activitiesView} from './src/views/activities.js';
+import {activityDetailsView} from './src/views/activityDetails.js';
+import {activityFormView} from './src/views/activityForm.js';
 import {registerView} from './src/views/register.js';
 import {loginView} from './src/views/login.js';
 
@@ -50,6 +52,18 @@ page('/books/:id', async (ctx) => {
 });
 page('/activities', async () => {
   renderPage(await activitiesView());
+  setActiveLink('/activities');
+});
+page('/activities/new', async () => {
+  renderPage(await activityFormView({ params: {} }));
+  setActiveLink('/activities');
+});
+page('/activities/:id', async (ctx) => {
+  renderPage(await activityDetailsView(ctx));
+  setActiveLink('/activities');
+});
+page('/activities/:id/edit', async (ctx) => {
+  renderPage(await activityFormView(ctx));
   setActiveLink('/activities');
 });
 page('/register', () => {

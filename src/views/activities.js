@@ -1,22 +1,63 @@
 import {html} from 'https://unpkg.com/lit-html?module';
+import page from 'https://unpkg.com/page/page.mjs';
 import {layout} from './layout.js';
 import { activityService } from '../services/activityService.js';
 
-const activitiesTemplate = (activities) => layout('Activities', html`
-  <p>Track activities fetched from the API.</p>
+const activitiesTemplate = (activities, onDelete) => layout('Activities', html`
+  <div class="activities-header">
+    <p>Track activities fetched from the API below.</p>
+    <a href="/activities/new" data-link class="button">Create activity</a>
+  </div>
+
   ${activities.length === 0 ? html`<p>No activities found.</p>` : html`
-    <ul class="item-list">
+    <ul class="book-list">
       ${activities.map(activity => html`
-        <li>
-          <strong>${activity.name || activity.title || 'Unnamed activity'}</strong>
-          ${activity.date ? html`<span>${activity.date}</span>` : ''}
-          <p>${activity.description || 'No details available.'}</p>
-        </li>`)}
+        <li class="book-card">
+          <span class="item-icon">🏃</span>
+          <div class="book-info">
+            <h2>${activity.title || activity.name || 'Unnamed activity'}</h2>
+            <p class="book-meta">${activity.dueDate ? new Date(activity.dueDate).toLocaleString() : 'No due date'}</p>
+            <p class="book-description">${activity.completed ? 'Completed' : 'Pending'}</p>
+          </div>
+
+          <div class="card-actions">
+            <a href="/activities/${activity.id}" data-link class="button">Details</a>
+            <a href="/activities/${activity.id}/edit" data-link class="button secondary">Edit</a>
+            <button type="button" @click=${() => onDelete(activity.id)} class="button danger">Delete</button>
+          </div>
+        </li>
+      `)}
     </ul>
   `}
 `);
 
 export async function activitiesView() {
-  const activities = await activityService.getAllActivities();
-  return activitiesTemplate(Array.isArray(activities) ? activities : []);
+  const apiActivities = await activityService.getAllActivities();
+  const localActivities = JSON.parse(localStorage.getItem('activities')) || [];
+
+  const activities = [
+    ...(Array.isArray(apiActivities) ? apiActivities : []),
+    ...localActivities
+  ];
+
+  const onDelete = async (id) => {
+    const confirmed = confirm('Delete this activity?');
+    if (!confirmed) return;
+
+    let localActivities = JSON.parse(localStorage.getItem('activities')) || [];
+
+    const updated = localActivities.filter(a => {
+      return String(a.id) !== String(id);
+    });
+
+    if (updated.length !== localActivities.length) {
+      localStorage.setItem('activities', JSON.stringify(updated));
+    } else {
+      await activityService.deleteActivity(id);
+    }
+
+    page.show('/activities');
+  };
+
+  return activitiesTemplate(activities, onDelete);
 }
