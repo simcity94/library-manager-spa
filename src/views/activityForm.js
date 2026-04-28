@@ -94,7 +94,7 @@ export async function activityFormView(ctx = { params: {} }) {
             page.show(`/activities/${activity.id}`);
         } else {
         
-            data.id = 'local-' + Date.now();;
+            data.id = 'local-' + Date.now();
 
             const localActivities = JSON.parse(localStorage.getItem('activities')) || [];
 

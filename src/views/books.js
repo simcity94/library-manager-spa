@@ -1,27 +1,10 @@
 import { html } from 'https://unpkg.com/lit-html?module';
 import { layout } from './layout.js';
 import { bookService } from '../services/bookService.js';
+import { buildPagination, getCurrentPage } from '../utility/pagination.js';
 
 const PAGE_SIZE = 8;
 
-function getCurrentPage() {
-  const params = new URLSearchParams(window.location.search);
-  const page = Number(params.get('page')) || 1;
-  return Math.max(page, 1);
-}
-
-function buildPagination(page, pageCount) {
-  return html`
-    <nav class="pagination">
-      ${Array.from({ length: pageCount }, (_, index) => {
-        const pageNumber = index + 1;
-        return html`
-          <a class="page-link ${pageNumber === page ? 'active' : ''}" href="/books?page=${pageNumber}" data-link>${pageNumber}</a>
-        `;
-      })}
-    </nav>
-  `;
-}
 
 function booksTemplate(books, page, pageCount) {
   return layout('Books', html`
@@ -39,15 +22,16 @@ function booksTemplate(books, page, pageCount) {
           </li>
         `)}
       </ul>
-      ${buildPagination(page, pageCount)}
+      ${buildPagination(page, pageCount, '/books')}
     `}
   `);
 }
 
-export async function booksView() {
+export async function booksView(ctx) {
   const allBooks = await bookService.getAllBooks();
   const books = Array.isArray(allBooks) ? allBooks : [];
-  const page = getCurrentPage();
+  const params = new URLSearchParams(ctx.querystring);
+  const page = Number(params.get('page')) || 1;
   const pageCount = Math.max(1, Math.ceil(books.length / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount);
   const pagedBooks = books.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);

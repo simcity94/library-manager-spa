@@ -2,8 +2,11 @@ import {html} from 'https://unpkg.com/lit-html?module';
 import page from 'https://unpkg.com/page/page.mjs';
 import {layout} from './layout.js';
 import { activityService } from '../services/activityService.js';
+import { buildPagination, getCurrentPage } from '../utility/pagination.js';
 
-const activitiesTemplate = (activities, onDelete) => layout('Activities', html`
+const PAGE_SIZE = 8;
+
+const activitiesTemplate = (activities, onDelete, page, pageCount) => layout('Activities', html`
   <div class="activities-header">
     <p>Track activities fetched from the API below.</p>
     <a href="/activities/new" data-link class="button">Create activity</a>
@@ -28,10 +31,11 @@ const activitiesTemplate = (activities, onDelete) => layout('Activities', html`
         </li>
       `)}
     </ul>
+    ${buildPagination(page, pageCount, '/activities')}
   `}
 `);
 
-export async function activitiesView() {
+export async function activitiesView(ctx) {
   const apiActivities = await activityService.getAllActivities();
   const localActivities = JSON.parse(localStorage.getItem('activities')) || [];
 
@@ -39,6 +43,16 @@ export async function activitiesView() {
     ...(Array.isArray(apiActivities) ? apiActivities : []),
     ...localActivities
   ];
+
+  const params = new URLSearchParams(ctx.querystring);
+  const page = Number(params.get('page')) || 1;
+  const pageCount = Math.max(1, Math.ceil(activities.length / PAGE_SIZE));
+  const currentPage = Math.min(page, pageCount);
+
+  const pagedActivities = activities.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
 
   const onDelete = async (id) => {
     const confirmed = confirm('Delete this activity?');
@@ -59,5 +73,6 @@ export async function activitiesView() {
     page.show('/activities');
   };
 
-  return activitiesTemplate(activities, onDelete);
+  return activitiesTemplate(pagedActivities, onDelete, currentPage, pageCount);
+  
 }
