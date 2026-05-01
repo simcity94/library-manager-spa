@@ -10,11 +10,17 @@ import {activityDetailsView} from './src/views/activityDetails.js';
 import {activityFormView} from './src/views/activityForm.js';
 import {registerView} from './src/views/register.js';
 import {loginView} from './src/views/login.js';
+import { userHelper } from './src/utility/userHelper.js';
+import { updateNav } from './src/utility/navigation.js';
 
 const ROOT = document.getElementById('page-root');
 
-function renderPage(template) {
+updateNav();
+
+function renderPage(template, path) {
   render(template, ROOT);
+  updateNav();           
+  setActiveLink(path);   
 }
 
 function normalizePath(path) {
@@ -34,28 +40,40 @@ function setActiveLink(path) {
 }
 
 page('/', () => {
-  renderPage(homeView());
-  setActiveLink('/');
+  renderPage(homeView(), '/');
+});
+
+page('/users', async () => {
+  renderPage(await usersView(), '/users');
+});
+
+page('/books', async (ctx) => {
+  renderPage(await booksView(ctx), '/books');
+});
+
+page('/activities', async (ctx) => {
+  renderPage(await activitiesView(ctx), '/activities');
+});
+
+page('/login', () => {
+  renderPage(loginView(), '/login');
+});
+
+page('/register', () => {
+  renderPage(registerView(), '/register');
+});
+
+page('/logout', () => {
+userHelper.clear();
+updateNav();
+page.redirect('/')
 });
 
 page('/index.html', () => page.redirect('/'));
 
-page('/users', async () => {
-  renderPage(await usersView());
-  setActiveLink('/users');
-});
-
-page('/books', async (ctx) => {
-  renderPage(await booksView(ctx));
-});
-
 page('/books/:id', async (ctx) => {
   renderPage(await bookDetailsView(ctx));
   setActiveLink('/books');
-});
-
-page('/activities', async (ctx) => {
-  renderPage(await activitiesView(ctx));
 });
 
 page('/activities/new', async () => {
@@ -73,31 +91,9 @@ page('/activities/:id/edit', async (ctx) => {
   setActiveLink('/activities');
 });
 
-page('/register', () => {
-  renderPage(registerView());
-  setActiveLink('/register');
-});
-
-page('/login', () => {
-  renderPage(loginView());
-  setActiveLink('/login');
-});
-
 page('*', () => {
   renderPage(layout('Not Found', html`<p>Page not found.</p>`));
   setActiveLink(location.pathname);
 });
 
 page();
-
-const navElements = document.querySelectorAll('[data-link]');
-navElements.forEach((element) => {
-  element.addEventListener('click', (event) => {
-  event.preventDefault();
-
-  const url = event.currentTarget.getAttribute('href');
-
-  page.show(url);
-  page.redirect(url);
-});
-});

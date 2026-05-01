@@ -33,37 +33,60 @@ header {
   color: white;
 }
 
-.nav-main,
-.nav-actions {
+header {
+  background: linear-gradient(135deg, #4f46e5, #3b82f6);
+  color: white;
+  padding: 0.8rem 2rem;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  flex-wrap: wrap;
+  gap: 2rem;
+  width: 100%;
+  justify-content: space-between;
 }
 
 .nav-main {
-  justify-self: center;
+  display: flex;
+  gap: 1.2rem;
 }
 
-.nav-main a,
-.nav-actions a {
+.nav-actions {
+  display: flex;
+  gap: 0.8rem;
+}
+
+nav a {
   color: white;
   text-decoration: none;
   font-weight: 500;
-  font-size: 1.05rem;
-  padding: 0.65rem 1rem;
+  padding: 0.5rem 0.9rem;
   border-radius: 999px;
-  transition: background 160ms ease, color 160ms ease;
+  transition: all 0.2s ease;
 }
 
-.nav-main a:hover,
+nav a:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.nav-actions a {
+  background: rgba(255,255,255,0.15);
+}
+
 .nav-actions a:hover {
-  background: rgba(255, 255, 255, 0.16);
+  background: white;
+  color: #4f46e5;
 }
 
-.nav-main a.active,
-.nav-actions a.active {
-  background: rgba(255, 255, 255, 0.28);
+nav a.active {
+  background: white;
+  color: #4f46e5;
+  font-weight: 600;
 }
 
 main {
@@ -318,3 +341,4 @@ footer {
 .page-dots {
   padding: 6px 8px;
 }
+

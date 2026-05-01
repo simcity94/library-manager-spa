@@ -1,9 +1,9 @@
 function setUserData(userData) {
-    const userInfo = { // check if extra info needed to add
-        email: userData.email,
-        id: userData._id,
-        accessToken: userData.accessToken
-    }
+    const userInfo = { 
+    email: userData.email,
+    id: userData._id || userData.id,
+    accessToken: userData.accessToken
+}
 
     sessionStorage.setItem("userInfo", JSON.stringify(userInfo));
 }
