@@ -225,13 +225,6 @@ footer {
   transform: translateY(-1px);
 }
 
-.pagination {
-  margin-top: 1.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
 .details-card {
   display: grid;
   gap: 1.5rem;
@@ -319,6 +312,8 @@ footer {
 
 .pagination {
   display: flex;
+  justify-content: center;
+  align-items: center;
   gap: 6px;
   margin-top: 20px;
   flex-wrap: wrap;

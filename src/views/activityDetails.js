@@ -2,6 +2,7 @@ import {html} from 'https://unpkg.com/lit-html?module';
 import page from 'https://unpkg.com/page/page.mjs';
 import {layout} from './layout.js';
 import { activityService } from '../services/activityService.js';
+import { userHelper } from '../utility/userHelper.js';
 
 const detailsTemplate = (activity, onDelete) => layout('Activity Details', html`
   <div class="details-card">
@@ -19,10 +20,16 @@ const detailsTemplate = (activity, onDelete) => layout('Activity Details', html`
     </div>
 
     <div class="details-actions">
-      <a href="/activities" data-link class="button secondary">Back to activities</a>
-      <a href="/activities/${activity.id}/edit" data-link class="button">Edit</a>
-      <button type="button" @click=${() => onDelete(activity.id)} class="button danger">Delete</button>
-    </div>
+  <a href="/activities" data-link class="button secondary">Back to activities</a>
+
+  ${(
+  userHelper.getUserId() &&
+  activity._ownerId &&
+  userHelper.getUserId() === activity._ownerId
+) ? html`
+  <a href="/activities/${activity.id}/edit" data-link class="button">Edit</a>
+  <button type="button" @click=${() => onDelete(activity.id)} class="button danger">Delete</button>
+` : ''}
   </div>
 `);
 

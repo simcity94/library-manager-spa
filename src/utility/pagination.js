@@ -1,23 +1,30 @@
 import { html } from 'https://unpkg.com/lit-html?module';
 import { repeat } from 'https://unpkg.com/lit-html/directives/repeat.js?module';
+import page from 'https://unpkg.com/page/page.mjs';
 
-export function buildPagination(page, pageCount, baseUrl) {
+export function buildPagination(currentPage, pageCount, baseUrl) {
     const maxVisible = 5; 
 
-    const start = Math.max(1, page - Math.floor(maxVisible / 2));
+    const start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
     const end = Math.min(pageCount, start + maxVisible - 1);
 
     const pages = [];
 
-    if (page > 1) {
+    if (currentPage > 1) {
         pages.push(html`
-      <a class="page-link" href="${baseUrl}?page=${page - 1}" data-link>Prev</a>
-    `);
+        <a 
+          class="page-link" 
+          href="${baseUrl}?page=${currentPage - 1}"
+          @click=${onNavigate}
+        >
+          Prev
+        </a>
+      `);
     }
 
     if (start > 1) {
         pages.push(html`
-      <a class="page-link" href="${baseUrl}?page=1" data-link>1</a>
+      <a class="page-link" href="${baseUrl}?page=1" @click=${onNavigate}>1</a>
     `);
 
         if (start > 2) {
@@ -35,9 +42,9 @@ export function buildPagination(page, pageCount, baseUrl) {
         (i) => i,
         (i) => html`
     <a 
-      class="page-link ${Number(i) === Number(page) ? 'active' : ''}"   
+      class="page-link ${Number(i) === Number(currentPage) ? 'active' : ''}"   
       href="${baseUrl}?page=${i}" 
-      data-link
+      @click=${onNavigate}
     >
       ${i}
     </a>
@@ -50,15 +57,15 @@ export function buildPagination(page, pageCount, baseUrl) {
         }
 
         pages.push(html`
-      <a class="page-link" href="${baseUrl}?page=${pageCount}" data-link>
+      <a class="page-link" href="${baseUrl}?page=${pageCount}" @click=${onNavigate}>
         ${pageCount}
       </a>
     `);
     }
 
-    if (page < pageCount) {
+    if (currentPage < pageCount) {
         pages.push(html`
-      <a class="page-link" href="${baseUrl}?page=${page + 1}" data-link>Next</a>
+      <a class="page-link" href="${baseUrl}?page=${currentPage + 1}" @click=${onNavigate}>Next</a>
     `);
     }
     return html`<nav class="pagination">${pages}</nav>`;
@@ -66,6 +73,11 @@ export function buildPagination(page, pageCount, baseUrl) {
 
 export function getCurrentPage() {
     const params = new URLSearchParams(window.location.search);
-    const page = Number(params.get('page')) || 1;
-    return Math.max(page, 1);
+    const currentPage = Number(params.get('page')) || 1;
+    return Math.max(currentPage, 1);
+}
+
+function onNavigate(e) {
+  e.preventDefault();
+  page.show(e.currentTarget.getAttribute('href'));
 }

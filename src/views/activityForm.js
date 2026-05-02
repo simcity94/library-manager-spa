@@ -2,6 +2,7 @@ import { html } from 'https://unpkg.com/lit-html?module';
 import page from 'https://unpkg.com/page/page.mjs';
 import { layout } from './layout.js';
 import { activityService } from '../services/activityService.js';
+import { userHelper } from '../utility/userHelper.js';
 
 const formTemplate = (activity, onSubmit, mode) => layout(`${mode} Activity`, html`
   <p>${mode === 'Create' ? 'Add a new activity to the tracker.' : 'Update the activity details below.'}</p>
@@ -95,6 +96,7 @@ export async function activityFormView(ctx = { params: {} }) {
         } else {
         
             data.id = 'local-' + Date.now();
+            data._ownerId = userHelper.getUserId();
 
             const localActivities = JSON.parse(localStorage.getItem('activities')) || [];
 

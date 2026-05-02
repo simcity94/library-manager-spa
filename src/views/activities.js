@@ -3,13 +3,16 @@ import page from 'https://unpkg.com/page/page.mjs';
 import {layout} from './layout.js';
 import { activityService } from '../services/activityService.js';
 import { buildPagination, getCurrentPage } from '../utility/pagination.js';
+import { userHelper } from '../utility/userHelper.js';
 
 const PAGE_SIZE = 8;
 
-const activitiesTemplate = (activities, onDelete, page, pageCount) => layout('Activities', html`
+const activitiesTemplate = (activities, onDelete, currentPage, pageCount) => layout('Activities', html`
   <div class="activities-header">
     <p>Track activities fetched from the API below.</p>
-    <a href="/activities/new" data-link class="button">Create activity</a>
+    ${userHelper.hasUser() ? html`
+      <a href="/activities/new" data-link class="button">Create activity</a>
+    ` : ''}
   </div>
 
   ${activities.length === 0 ? html`<p>No activities found.</p>` : html`
@@ -25,13 +28,18 @@ const activitiesTemplate = (activities, onDelete, page, pageCount) => layout('Ac
 
           <div class="card-actions">
             <a href="/activities/${activity.id}" data-link class="button">Details</a>
-            <a href="/activities/${activity.id}/edit" data-link class="button secondary">Edit</a>
-            <button type="button" @click=${() => onDelete(activity.id)} class="button danger">Delete</button>
+
+          ${(userHelper.getUserId() &&
+            activity._ownerId &&
+            userHelper.getUserId() === activity._ownerId) ?
+             html`
+              <a href="/activities/${activity.id}/edit" data-link class="button secondary">Edit</a>
+              <button type="button" @click=${() => onDelete(activity.id)} class="button danger">Delete</button>
+              ` : ''}
           </div>
-        </li>
       `)}
     </ul>
-    ${buildPagination(page, pageCount, '/activities')}
+    ${buildPagination(currentPage, pageCount, '/activities')}
   `}
 `);
 
@@ -45,13 +53,13 @@ export async function activitiesView(ctx) {
   ];
 
   const params = new URLSearchParams(ctx.querystring);
-  const page = Number(params.get('page')) || 1;
+  const currentPage = Number(params.get('page')) || 1;
   const pageCount = Math.max(1, Math.ceil(activities.length / PAGE_SIZE));
-  const currentPage = Math.min(page, pageCount);
+  const safePage = Math.min(currentPage, pageCount);
 
   const pagedActivities = activities.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE
   );
 
   const onDelete = async (id) => {
@@ -70,9 +78,8 @@ export async function activitiesView(ctx) {
       await activityService.deleteActivity(id);
     }
 
-    page.show('/activities');
+    page.redirect('/activities');
   };
 
-  return activitiesTemplate(pagedActivities, onDelete, currentPage, pageCount);
-  
+  return activitiesTemplate(pagedActivities, onDelete, safePage, pageCount);
 }

@@ -39,6 +39,13 @@ function setActiveLink(path) {
   });
 }
 
+function requireAuth(ctx, next) {
+  if (!userHelper.hasUser()) {
+    return page.redirect('/login');
+  }
+  next();
+}
+
 page('/', () => {
   renderPage(homeView(), '/');
 });
@@ -51,8 +58,30 @@ page('/books', async (ctx) => {
   renderPage(await booksView(ctx), '/books');
 });
 
+page('/books/:id', async (ctx) => {
+  renderPage(await bookDetailsView(ctx));
+  setActiveLink('/books');
+});
+
 page('/activities', async (ctx) => {
   renderPage(await activitiesView(ctx), '/activities');
+});
+
+page('/activities?page=:page', async (ctx) => {
+  renderPage(await activitiesView(ctx), '/activities');
+});
+
+page('/activities/new', requireAuth, async () => {
+  renderPage(await activityFormView({ params: {} }));
+});
+
+page('/activities/:id', async (ctx) => {
+  renderPage(await activityDetailsView(ctx));
+  setActiveLink('/activities');
+});
+
+page('/activities/:id/edit', requireAuth, async (ctx) => {
+  renderPage(await activityFormView(ctx));
 });
 
 page('/login', () => {
@@ -70,26 +99,6 @@ page.redirect('/')
 });
 
 page('/index.html', () => page.redirect('/'));
-
-page('/books/:id', async (ctx) => {
-  renderPage(await bookDetailsView(ctx));
-  setActiveLink('/books');
-});
-
-page('/activities/new', async () => {
-  renderPage(await activityFormView({ params: {} }));
-  setActiveLink('/activities');
-});
-
-page('/activities/:id', async (ctx) => {
-  renderPage(await activityDetailsView(ctx));
-  setActiveLink('/activities');
-});
-
-page('/activities/:id/edit', async (ctx) => {
-  renderPage(await activityFormView(ctx));
-  setActiveLink('/activities');
-});
 
 page('*', () => {
   renderPage(layout('Not Found', html`<p>Page not found.</p>`));
